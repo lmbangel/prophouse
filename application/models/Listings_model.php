@@ -1,5 +1,7 @@
 <?php
 
+use LDAP\Result;
+
 class Listings_model extends CI_Model
 {
 
@@ -33,21 +35,48 @@ class Listings_model extends CI_Model
         curl_close($curl);
         return $result;
     }
-    private function getAllListings($options = FALSE)
+    public function getListings($slug = 'jeffreys-bay')
     {
-        $data = $options ? $options : array();
+        if ($slug == 'jeffreys-bay') {
+            $data['location_id'] = 2;
+            try {
+                $response = json_decode($this->callAPI('https://business.propertyhouse.co.za/public/api/listings/summary', $data, "GET"));
+            } catch (Exception $e) {
+                $response = $e->getMessage();
+            }
+        }
+        if ($slug != 'jeffreys-bay'){
+            $data['location_id'] = $slug;
+            try {
+                $response = json_decode($this->callAPI('https://business.propertyhouse.co.za/public/api/listings/summary', $data, "GET"));
+            } catch (Exception $e) {
+                $response = $e->getMessage();
+            }
+        }
+        
+        return $response;
+    }
+    public function searchListingsByCity($city)
+    {
+        $city = trim($city);
+        $data['city'] = $city;
         try {
-            $response = json_decode($this->callAPI('https://business.propertyhouse.co.za/public/api/listings/browse', $data, "GET"));
+            $response = json_decode($this->callAPI('https://business.propertyhouse.co.za/public/api/locationsearch/summary', $data, "GET"));
+        } catch (Exception $e) {
+            $response = $e->getMessage();
+        }
+        
+        return $response;
+    }
+
+    public function getListingById($id)
+    {
+        $data = array();
+        try {
+            $response = json_decode($this->callAPI('https://business.propertyhouse.co.za/public/api/listings/read/' . $id, $data, ""));
         } catch (Exception $e) {
             $response = $e->getMessage();
         }
         return $response;
-    }
-    public function get_listings($slug = FALSE)
-    {
-        if ($slug === FALSE) {
-            $lisings  = $this->getAllListings();
-            return $lisings;
-        }
     }
 }

@@ -1,1 +1,1 @@
-<?= json_encode($listings) ?>
+<?= json_encode($city) ?>

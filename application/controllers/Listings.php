@@ -2,14 +2,11 @@
 
 class Listings extends CI_Controller
 {
-    public function index()
+    public function index($city)
     {
-        $data['title'] = ucfirst('Listings');
-        $data['listings'] = $this->Listings_model->get_listings();
-        // var_dump($data['listings']);
-        $this->load->view('components/header', $data);
-        $this->load->view('listings/index', $data);
-        $this->load->view('components/footer');
-
+        
+        $locations = $this->Listings_model->searchListingsByCity($city);
+        $data = $this->Listings_model->getListings($locations->data[0]->id); # By location ID
+        echo json_encode($data);
     }
 }
